@@ -32,12 +32,12 @@ s.meter; // check the meter
 	Mix.ar(LFPar.ar(
 		freq: (1800, 1820 .. 2000),
 		iphase: 0,
-		mul: 0.05 * EnvGen.ar(Env.triangle(dur: dur, doneAction: 2))))
+		mul: 0.05 * EnvGen.ar(Env.triangle(dur: dur), doneAction: 2)))
 };
 
 // Cricket 3
 ~c3 =
-{var dur = [0.7, 0.8, 0.9].choose;
+{var dur = [0.3, 0.4, 0.5].choose;
 		FreeVerb.ar(
 			in: Mix.ar(LFPar.ar(
 				freq: (2700, 2720 .. 3000)+LFSaw.ar(1).range(40,1000),
