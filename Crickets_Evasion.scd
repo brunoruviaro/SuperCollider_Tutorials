@@ -16,9 +16,7 @@ Window.closeAll;
 			{win.view.background = Color.red(0.5,i)}.defer(0);
 			0.01.wait;
 		    });
-    // Wait half second before saying we're done
-    0.5.wait;
-    //"chirp".postln;
+    "evaded...".postln;
 }.play;
 };
 
