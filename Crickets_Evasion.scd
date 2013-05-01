@@ -1,3 +1,11 @@
+Window.closeAll; // use this to close all windows
+
+// If you still have your crickets saved as ~c1, ~c2, etc..
+// then they should play right out of the box with this patch.
+// Evaluate the region of code below and look for the little
+// red window that pops up (may be behind other windows).
+// Once you find the window with the button, CRICK IT!
+
 (
 var availableBounds = Window.availableBounds;
 var width = 150;
