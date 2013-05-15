@@ -80,3 +80,37 @@ etc...
 
 */
 
+
+
+/////////////////////////////////////
+
+
+Ndef(\a).play; // start;
+Ndef(\a).fadeTime = 1; // fadeTime (crossfade between changes)
+
+// Evaluate the grains,
+// Change them as you like,
+// Evaluate again,
+// etc
+
+(
+Ndef(\a,
+{
+	var buffer = ~mybuffer.bufnum;
+	var bufdur = BufDur.kr(buffer);
+	Mix(TGrains.ar(
+			numChannels: 2,
+			trigger: Impulse.ar(MouseX.kr(1/4,10)), // change these numbers
+			bufnum: buffer,
+			rate: MouseX.kr(1,2), // change these numbers
+			centerPos: 3, // LFNoise0.kr(1).range(0,5),
+			dur: MouseY.kr(0.5,5),
+			amp: 0.5))
+})
+)
+
+// Try any of these:
+// LFNoise0.kr(a).range(b, c),
+// MouseX.kr(a, b),
+// MouseY.kr(a, b),
+
