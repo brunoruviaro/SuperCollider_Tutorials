@@ -42,7 +42,7 @@ Window.closeAll;
 	).front;
 	// Create button;
 	b = Button.new(w, Rect(0,0,width,height));
-	b.states = [["Evade", Color.white, Color.red(0.7, 0.9)]];
+	b.states = [["Crick It!", Color.white, Color.red(0.7, 0.9)]];
 	b.action = {
 		~makeWindow.value;
 		~fade.value(w);
