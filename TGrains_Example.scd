@@ -84,6 +84,7 @@ etc...
 
 /////////////////////////////////////
 
+// The structure below will let you change the values and re-evaluate in real time, without having to stop the sounds and start again. It will cross fade between each evaluation.
 
 Ndef(\a).play; // start;
 Ndef(\a).fadeTime = 1; // fadeTime (crossfade between changes)
