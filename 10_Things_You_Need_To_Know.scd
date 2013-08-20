@@ -2,7 +2,6 @@
 // 10 Things You Need To Know  (SuperCollider Total Beginner) //
 ////////////////////////////////////////////////////////////////
 
-
 // *****************************
 // 1. EVALUATE: CONTROL + ENTER
 // *****************************
@@ -42,8 +41,6 @@
 
 {WhiteNoise.ar(Line.kr(start: 0, end: 1, dur: 60))}.play;
 
-
-
 // ***********************************
 // 4. END YOUR LINES WITH A SEMICOLON
 // ***********************************
@@ -60,7 +57,6 @@
 // leave some semicolons out, or you may just forget it sometimes.
 // Still, if you get into the habit of always ending your lines
 // with semicolons, you may save yourself from some trouble in the future.
-
 
 // **************
 // 5. CODE BLOCK
