@@ -69,6 +69,19 @@ SynthDef("kick3", {arg punch = 1, amp = 1;
     Out.ar(0, sig ! 2);
 }).add;
 
+SynthDef("kick808", {arg freq1 = 240, freq2 = 60, amp = 1, ringTime = 10, rel = 1, dist = 0.5, pan = 0;
+    var snd, env;
+	snd = Ringz.ar(
+		in: Impulse.ar(0), // single impulse
+		freq: XLine.ar(freq1, freq2, 0.1),
+		decaytime: ringTime);
+	env = EnvGen.ar(Env.perc(0.001, rel), doneAction: 2);
+	snd = (1.0 - dist) * snd + (dist * (snd.distort));
+	snd = snd * env * amp;
+	Out.ar(0, Pan2.ar(snd, pan));
+}).add;
+
+
 SynthDef(\harpsi, { |outbus = 0, freq = 440, amp = 0.1, gate = 1|
     var out;
     out = EnvGen.ar(Env.adsr, gate, doneAction: 2) * amp *
