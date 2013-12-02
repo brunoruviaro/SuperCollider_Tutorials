@@ -17,6 +17,18 @@ Out.ar(0, out*amp); //Out.ar(bus, out);
 
 }).add;
 
+
+SynthDef("marimba", {arg freq= 220, amp = 0.4;
+	var snd, env;
+	env = EnvGen.kr(Env.linen(0.015, 1, 0.5), levelScale: amp, doneAction: 2);
+	snd = BPF.ar(
+		in: Saw.ar(0),
+		freq: freq,
+		rq: 0.02);
+	snd = BLowShelf.ar(snd, 220, 0.81, 6);
+	Out.ar(0, Splay.ar(snd*env*0.3));
+}).add;
+
 SynthDef("blips", {
 	arg freq = 25, numharm = 10, rel = 1, amp = 0.1;
 	var snd, env;
@@ -81,8 +93,19 @@ SynthDef("kick808", {arg freq1 = 240, freq2 = 60, amp = 1, ringTime = 10, rel = 
 	Out.ar(0, Pan2.ar(snd, pan));
 }).add;
 
+SynthDef("ringkick", {arg freq = 40, decay = 0.25, amp = 1;
+	var snd;
+	snd = Ringz.ar(
+		in: LPF.ar(
+			in: Impulse.ar(0),
+			freq: 1000),
+		freq: freq,
+		decaytime: decay,
+		mul: 7 * amp).tanh.sin*2;
+	Out.ar(0, snd!2);
+}).add;
 
-SynthDef(\harpsi, { |outbus = 0, freq = 440, amp = 0.1, gate = 1|
+SynthDef("harpsi", { |outbus = 0, freq = 440, amp = 0.1, gate = 1|
     var out;
     out = EnvGen.ar(Env.adsr, gate, doneAction: 2) * amp *
         Pulse.ar(freq, 0.25, 0.75);
@@ -95,6 +118,96 @@ SynthDef("beating", {arg freq = 440, amp = 0.1, art = 1;
 	snd1 = SinOsc.ar(freq);
 	snd2 = SinOsc.ar(Line.kr(freq+15, freq, art));
 	Out.ar(0, Pan2.ar(Mix([snd1, snd2]), 0, amp*env))
+}).add;
+
+SynthDef("bass", { |freq = 440, gate = 1, amp = 0.5, slideTime = 0.17, ffreq = 1100, width = 0.15, detune = 1.005, preamp = 4|
+    var sig, env;
+	env = Env.adsr(0.01, 0.3, 0.4, 0.1);
+    freq = Lag.kr(freq, slideTime);
+    sig = Mix(VarSaw.ar([freq, freq * detune], 0, width, preamp)).distort;
+	sig = sig * amp * EnvGen.kr(env, gate, doneAction: 2);
+    sig = LPF.ar(sig, ffreq);
+    Out.ar(0, sig ! 2)
+}).add;
+
+SynthDef("kik", { |basefreq = 50, ratio = 7, sweeptime = 0.05, preamp = 1, amp = 1, decay1 = 0.3, decay1L = 0.8, decay2 = 0.15, out|
+    var fcurve = EnvGen.kr(Env([basefreq * ratio, basefreq], [sweeptime], \exp)),
+        env = EnvGen.kr(Env([1, decay1L, 0], [decay1, decay2], -4), doneAction: 2),
+        sig = SinOsc.ar(fcurve, 0.5pi, preamp).distort * env * amp;
+    Out.ar(out, sig ! 2)
+}).add;
+
+SynthDef("kraftySnr", { |amp = 1, freq = 2000, rq = 3, decay = 0.3, pan, out|
+	var sig = PinkNoise.ar(amp),
+	env = EnvGen.kr(Env.perc(0.01, decay), doneAction: 2);
+	sig = BPF.ar(sig, freq, rq, env);
+	Out.ar(out, Pan2.ar(sig, pan))
+}).add;
+
+SynthDef("sillyVoice", { arg
+	freq = 220,
+	amp = 0.5,
+	vibratoSpeed = 6,
+	vibratoDepth = 4,
+	vowel = 0,
+	att = 0.01,
+	rel = 0.1,
+	lag = 1,
+	gate = 1;
+
+	var in, vibrato, env, va, ve, vi, vo, vu, snd;
+
+	vibrato = SinOsc.kr(vibratoSpeed, mul: vibratoDepth);
+	in = Saw.ar(Lag.kr(freq, lag) + vibrato);
+	env = EnvGen.kr(Env.asr(att, 1, rel), gate, doneAction: 2);
+
+	va = BBandPass.ar(
+		in: in,
+		freq: [ 600, 1040, 2250, 2450, 2750 ],
+		bw: [ 0.1, 0.067307692307692, 0.048888888888889, 0.048979591836735, 0.047272727272727 ],
+		mul: [ 1, 0.44668359215096, 0.35481338923358, 0.35481338923358, 0.1 ]);
+
+	ve = BBandPass.ar(
+		in: in,
+		freq: [ 400, 1620, 2400, 2800, 3100 ] ,
+		bw: [ 0.1, 0.049382716049383, 0.041666666666667, 0.042857142857143, 0.038709677419355 ],
+		mul: [ 1, 0.25118864315096, 0.35481338923358, 0.25118864315096, 0.12589254117942 ]);
+
+	vi = BBandPass.ar(
+		in: in,
+		freq: [ 250, 1750, 2600, 3050, 3340 ] ,
+		bw: [ 0.24, 0.051428571428571, 0.038461538461538, 0.039344262295082, 0.035928143712575 ],
+		mul: [ 1, 0.031622776601684, 0.15848931924611, 0.079432823472428, 0.03981071705535 ] );
+
+	vo = BBandPass.ar(
+		in: in,
+		freq:[ 400, 750, 2400, 2600, 2900 ] ,
+		bw: [ 0.1, 0.10666666666667, 0.041666666666667, 0.046153846153846, 0.041379310344828 ],
+		mul: [ 1, 0.28183829312645, 0.089125093813375, 0.1, 0.01 ]);
+
+	vu = BBandPass.ar(
+		in: in,
+		freq: [ 350, 600, 2400, 2675, 2950 ],
+		bw: [ 0.11428571428571, 0.13333333333333, 0.041666666666667, 0.044859813084112, 0.040677966101695 ],
+		mul: [ 1, 0.1, 0.025118864315096, 0.03981071705535, 0.015848931924611 ]);
+
+	snd = SelectX.ar(Lag.kr(vowel, lag), [va, ve, vi, vo, vu]);
+	snd = Mix.new(snd);
+	Out.ar(0, snd!2 * env * amp);
+}).add;
+
+SynthDef("plucking", {arg amp = 0.1, freq = 440, decay = 5, coef = 0.1;
+var env, snd;
+env = EnvGen.kr(Env.linen(0, decay, 0), doneAction: 2);
+snd = Pluck.ar(
+        in: WhiteNoise.ar(amp),
+        trig: Impulse.kr(0),
+
+        maxdelaytime: 0.1,
+        delaytime: freq.reciprocal,
+        decaytime: decay,
+        coef: coef);
+    Out.ar(0, [snd, snd]);
 }).add;
 
 SynthDef("defaultB", { arg out=0, freq=440, amp=0.1, pan=0, gate=1;
@@ -112,30 +225,6 @@ SynthDef("trig_demo", { |freq = 440, gate = 1, t_trig = 1|
     sig = SinOsc.ar(freq, 0, env);
 	sig = sig * Linen.kr(gate, 0.01, 0.1, 0.1, doneAction: 2);
     Out.ar(0, sig ! 2)
-}).add;
-
-SynthDef(\bass, { |freq = 440, gate = 1, amp = 0.5, slideTime = 0.17, ffreq = 1100, width = 0.15, detune = 1.005, preamp = 4|
-    var sig, env;
-	env = Env.adsr(0.01, 0.3, 0.4, 0.1);
-    freq = Lag.kr(freq, slideTime);
-    sig = Mix(VarSaw.ar([freq, freq * detune], 0, width, preamp)).distort;
-	sig = sig * amp * EnvGen.kr(env, gate, doneAction: 2);
-    sig = LPF.ar(sig, ffreq);
-    Out.ar(0, sig ! 2)
-}).add;
-
-SynthDef(\kik, { |basefreq = 50, ratio = 7, sweeptime = 0.05, preamp = 1, amp = 1, decay1 = 0.3, decay1L = 0.8, decay2 = 0.15, out|
-    var fcurve = EnvGen.kr(Env([basefreq * ratio, basefreq], [sweeptime], \exp)),
-        env = EnvGen.kr(Env([1, decay1L, 0], [decay1, decay2], -4), doneAction: 2),
-        sig = SinOsc.ar(fcurve, 0.5pi, preamp).distort * env * amp;
-    Out.ar(out, sig ! 2)
-}).add;
-
-SynthDef(\kraftySnr, { |amp = 1, freq = 2000, rq = 3, decay = 0.3, pan, out|
-	var sig = PinkNoise.ar(amp),
-	env = EnvGen.kr(Env.perc(0.01, decay), doneAction: 2);
-	sig = BPF.ar(sig, freq, rq, env);
-	Out.ar(out, Pan2.ar(sig, pan))
 }).add;
 
 "SynthDefs_2013.scd loaded".postln;
