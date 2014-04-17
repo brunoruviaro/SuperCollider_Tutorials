@@ -24,7 +24,7 @@
 // Server is on, those numbers will be in green color. After booting
 // the Server, run the line below to test that you can make sound:
 
-{SinOsc.ar(freq: MouseY.kr(300, 2000), mul: Line.kr(0.2, 0, 10))}.play;
+{ SinOsc.ar(freq: MouseY.kr(300, 2000), mul: MouseX.kr(0, 1)) }.play;
 
 // (Move your mouse up and down just for fun. Sound will fade out in 10 seconds.)
 
