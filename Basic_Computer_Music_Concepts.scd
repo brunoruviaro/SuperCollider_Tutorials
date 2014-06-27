@@ -1,3 +1,33 @@
+// keep moving.
+// nothing to see here.
+
+// this tutorial file is unfinished.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 /////////////////////////////////////
 // Basic Computer Music Concepts
 // Sound Design class

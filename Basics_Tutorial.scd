@@ -3,7 +3,7 @@
 ////////////////////////
 
 // How to evaluate a line:
-// [ctrl+enter]
+// [ctrl+Enter]
 
 // Use a semicolon to end your lines.
 // Evaluate lines below and see the results.
@@ -12,7 +12,7 @@
 
 // Get yourself some GUI:
 
-s.meter;
+s.meter; // same as [ctrl+M]
 
 // Make some sound:
 
@@ -43,10 +43,8 @@ y.postln;
 y.at(1); // retrive an item by index (starting at 0)
 y[1]; // shortcut, same as line above
 
-// Help files
 
-Help.gui; // Use this! Also available online: http://doc.sccode.org/
-
+// Help files! Use them. Also available online: http://doc.sccode.org/
 // Also, select any valid word in SC code and type ctrl + D. The corresponding help file will appear.
 
 // Below, more "grammar" stuff to understand the language... read on!

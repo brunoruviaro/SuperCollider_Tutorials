@@ -260,9 +260,14 @@ x.free;
 "UGen done-actions".help
 
 
-// *************************
-// 9.
-// *************************
+
+// **********************************
+// 9. PBINDS WITH CUSTOM INSTRUMENTS
+// **********************************
+
+// Once you know how to create your own Synth Definitions,
+// you can use Pbind to play them. For example, let's use the
+// "testing" SynthDef that we created above at #7:
 
 (
 Pbind(
@@ -273,10 +278,59 @@ Pbind(
 ).play;
 )
 
+// Notice that this works nicely since each note created
+// by the SynthDef "testing" knows how to stop itself (doneAction: 2)
+
+
+
+
+// ******************
+// 11. FUNCTIONS
+// ******************
+
+// When you find yourself doing the same task several times,
+// it may be a good time to create a reusable function.
+// A function is something enclosed within curly braces.
+
+f = { 2 + 2 }; // define the function
+
+f.value; // put the function to work
+
+// The function above is not that useful, as it only knows how to do one thing.
+// Normally you will want to define functions that can accept arguments.
+
+g = { arg a, b; ["a plus b", a+b, "a times b", a*b].postln };
+
+g.value(3, 7); // now you can give any two numbers as arguments to the function
+g.value(10, 14);
+
+// Compare the difference:
+
+~sillyRand = rrand(0, 10);
+~sillyRand.value; // evaluate several times
+
+~sillyRand2 = { rrand(0, 10) };
+~sillyRand2.value; // evaluate several times
+
+
+
+
 
 // ************************
-// 10.
+// 12. HOW TO "DO" AN ARRAY
 // ************************
+
+// Often you will need to do some action over all items of a collection.
+// Suppose you have a list of frequencies:
+
+~myFreqs = Array.fill(10, { rrand(440, 880) });
+
+// Now let's do some simple action on every item of the list:
+
+~myFreqs.do({ arg item, count; ["Freq", item, "Closest midinote is", item.cpsmidi.round].postln });
+
+
+
 
 
 

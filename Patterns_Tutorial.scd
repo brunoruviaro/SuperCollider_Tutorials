@@ -6,10 +6,10 @@
 // The goal is to start making sound right away as you learn to use Patterns.
 // Don't worry about every single detail of what is happening under the hood.
 // Later on, you can learn a lot more about Patterns by reading the
-// great "Pattern Guide" (by James Harkins) in the Documentation.
+// excellent "Pattern Guide" (by James Harkins) in the Documentation.
 
 // A Pattern is like a blueprint for a building, or a recipe.
-// The Pattern below specifies the following recipe: "take the list provided and read through it 2 times".
+// The Pattern below specifies the following recipe: "take the list provided and read through it twice".
 
 Pseq([1, 2, 3, 4, 5], 2);
 
@@ -203,7 +203,7 @@ Pbind(
 		Pseq([3, 4, 3, 5, 5, 5, 5, 4], inf),
 		Pseq([0, 0, 0, 2, 3, 4, 3, 1], inf)], inf),
 	\dur, Pseq([0.15, 0.15, 0.25, 0.25, 0.15, 0.15, 0.25], inf),
-	\sustain, 0.1;
+	\legato, 0.1;
 ).play;
 )
 
@@ -216,7 +216,7 @@ Pbind(
 Pbind(
     \degree, Pslide((-6, -4 .. 12), 8, 3, 1, 0),
     \dur, Pseq([0.1, 0.1, 0.2], inf),
-    \sustain, 0.15
+    \legato, 0.7
 ).play;
 )
 
@@ -230,24 +230,19 @@ Pbind(
 // "kick2"
 
 /*
-From this point on we need the file SynthDefs_2013.scd to be evaluated, so that these new synths are loaded into memory. Two ways of doing this:
-
-a) Open the file "SynthDefs_2013.scd" and evaluate it (Ctrl + A, then Ctrl + Enter);
-
-OR
-
-b) Change the file path below to match the location of the this file on your computer and then evaluate the line.
+From this point on we need the file SynthDefs_2013.scd to be evaluated, so that these new synths are loaded into memory. If you have copied the entire folder of tutorials from https://github.com/brunoruviaro/SuperCollider_Tutorials, you should already have this file. In this case you can simply run the following line to evaluate it:
 */
 
-"/home/ruviaro/Music/SuperCollider/SynthDefs_2013.scd".load;
+"SynthDefs_2013.scd".loadRelative;
 
+// Now try a Pbind with a different instrument:
 (
 Pbind(
 	\instrument, "PMCrotale",
-	\midinote, Pseq([60, 67, 78, 71, 40]),
-	\dur, Pseq([0.1, 0.1, 0.5, 0.4, 1]),
+	\midinote, Pseq([60, 67, 78, 71, 40], 4),
+	\dur, Pseq([0.1, 0.1, 0.5, 0.4, 1], inf),
 	\art, 1,
-	\amp, 0.1;
+	\amp, 0.2;
 ).play;
 )
 
@@ -324,8 +319,8 @@ Pbind(
 (
 Pbind(
 	\instrument, "snare",
-	\dur, Prand([1.5, 2.5, 3, 4.7, 6]*1/3, inf),
-	\sinfreq, Pwhite(100,160,inf),
+	\dur, Pseq([Pseq([1, 1/3, 1/3, 1/3], 3), 1, 1], 4) * 0.3,
+	\sinfreq, Pwhite(100,110,inf),
 	\amp, 0.05;
 ).play;
 )
@@ -362,7 +357,7 @@ p = Pbind(
 (
 p = Pbind(
 	\instrument, "kick3",
-	\punch, Place([0.01, 0.25, 1, 4, 30, 1000]!4, inf),
+	\punch, Place([0.01, 0.1, 1, 10, 100, 1000]!4, inf),
 	\amp, 0.1, // careful: can be loud!
 	\dur, 0.5,
 ).play;
@@ -391,7 +386,6 @@ Pbind(
 Pseq([1, 2, 3], 4).asStream.all;    // 12 items = 4 repeats * 3 items
 Pser([1, 2, 3, 4, 5, 6, 7], 5).asStream.all;    // 5 items only
 Pwhite(0, 7, 10).asStream.all; // 10 random numbers between 0 and 7 (including 7)
-
 Pslide([1, 2, 3, 4, 5, 6, 7, 8], 10, 3, 1, 0, false).asStream.all;
 
 // Another way of writing the same thing (declaring arguments explicitly may be helpful):
@@ -408,7 +402,7 @@ Pslide(
 
 // Dirty trick to generate an Array:
 
-(-5, -4 .. 12)
+(-5, -4 .. 12);
 
 // So this is what we get:
 

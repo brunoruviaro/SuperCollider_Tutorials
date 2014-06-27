@@ -175,8 +175,67 @@ rrand(10, 20); // generate a random number between 10 and 20
 // is VERY helpful to debug and better understand your code.
 
 
+// **************
+// 10. VARIABLES
+// **************
+
+// You can store numbers, words, UGens, functions, or entire blocks of code in VARIABLES.
+// Use the equal (=) sign to "assign" a variable.
+// Lowercase letters a through z can be used anytime:
+
+a = [1, 2, 3, 4, 5, 6].scramble;
+
+a; // now "a" holds the result of the line above.
+
+b = a + 10; // and "b" holds the result of a plus 10.
+
+// Do not use the letter "s" for a variable. It is normally reserved to represent the SuperCollider server.
+
+// Often it will make more sense to give better names to your variables,
+// to help you remember what they stand for in your code.
+// You can use a ~ to declare a variable with a longer name.
+
+~myList = [10, 22, 33, 44, 55, 66].scramble;
+
+~myList * 100;
+
+// Variable names must begin with the lowercase letters a through z (you can use numbers or underscores within the name, just not as the first character), and they must be contiguous (no spaces or punctuation).
+
+// There are two types of variables that you can create: environment variables and local variables.
+
+// ENVIRONMENT VARIABLES
+// The ones seen up to now are environment variables (some people loosely call them “global variables”): they are the single lowercase letters a through z, or those starting with the tilde (~) character. They will work anywhere in the patch, in other patches, even in other SC documents.
+
+// LOCAL VARIABLES
+// Local variables are declared with the reserved keyword var at the beginning of your code. Note that you can assign a value to a variable at declaration (var rate = 4). Variables declared this way only exist within the scope of that code block.
+
+// Here's a simple example comparing the two types of variables:
+
+// Environment variables
+~galaApples = 4;
+~bloodOranges = 5;
+~limes = 2;
+~plantains = 1;
+
+["Citrus", ~bloodOranges + ~limes];
+["Non-citrus", ~plantains + ~galaApples];
+
+// Local variables
+(
+var apples = 4, oranges = 3, lemons = 8, bananas = 10;
+["Citrus fruits", oranges + lemons].postln;
+["Non-citrus fruits", bananas + apples].postln;
+"End".postln;
+)
+
+~galaApples; // still exists
+apples; // gone
+
+
+
+
 // ************************
-// 10. USE THE HELP FILES
+// 11. (BONUS) USE THE HELP FILES
 // ************************
 
 // Find help by selecting an Object or method in the code
