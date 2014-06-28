@@ -2,6 +2,15 @@
 // SUPERCOLLIDER BASICS
 ////////////////////////
 
+// HOW TO EVALUATE
+// START AND STOP SOUND
+// WRITING COMMENTS
+// MESSAGES AND ARGUMENTS
+// NESTING
+// RECEIVER NOTATION, FUNCTIONAL NOTATION
+// ENCLOSURES
+// VARIABLES
+
 // How to evaluate a line:
 // [ctrl+Enter]
 
@@ -152,7 +161,7 @@ dup(round(rand(1000.0), 0.1), 5); // rewrite this using receiver notation only
 (1, 3 .. 20)  // Yes, maybe confusing in the beginning. Better face it early on though! :-)
 
 // For a handy summary of common Array operations, see
-// https://ccrma.stanford.edu/wiki/SuperCollider_Quick_Reference#Arrays
+"https://ccrma.stanford.edu/wiki/SuperCollider_Quick_Reference#Arrays".openDocument;
 
 // {BRACES}
 // Curly braces define functions. Functions perform specific tasks that are usually repeated several times, normally with different results.
