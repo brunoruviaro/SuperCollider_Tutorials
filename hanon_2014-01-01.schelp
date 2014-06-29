@@ -1,0 +1,1249 @@
+TITLE:: Hanon
+SUMMARY:: The Virtuoso Computer Musician
+CATEGORIES:: Other
+RELATED:: Tutorials/Getting-Started/00-Getting-Started-With-SC, Tutorials/A-Practical-Guide/PG_01_Introduction
+
+SECTION::Description
+A collection of short exercises for your daily practice of SuperCollider.
+
+by Bruno Ruviaro
+
+December, 2013
+
+
+
+SECTION::1
+Here's a simple sine wave that plays on the left channel only:
+CODE::
+{SinOsc.ar(freq: 440, mul: 0.1)}.play;
+::
+Change the line above so that you hear an additional sine wave at 444 Hz on the right channel.
+
+See footnote for one solution.
+footnote::
+CODE::
+{SinOsc.ar(freq: [440, 444], mul: 0.1)}.play;
+::
+See link::Guides/Multichannel-Expansion:: for more info.
+::
+
+
+
+SECTION::2
+The Pbind below plays a sequence of notes only once. Make it play forever.
+CODE::
+Pbind(
+    \note, Pseq([4, 6, 11, 13, 14, 6, 4, 13, 11, 6, 14, 13], 1),
+    \dur, 0.15
+).play;
+::
+See footnote for one solution.
+footnote::
+CODE::
+// Replace 1 by inf:
+Pbind(
+    \note, Pseq([4, 6, 11, 13, 14, 6, 4, 13, 11, 6, 14, 13], inf),
+    \dur, 0.15
+).play;
+::
+::
+
+
+
+SECTION::3
+The line below plays a simple note using SuperCollider's built-in default instrument:
+CODE::
+(freq: 440).play;
+::
+Modify the code above so that every time you evaluate this line you get a different frequency, randomly chosen between a low and a high boundary. Use A4 (440 Hz) as the lower boundary, and A5 (one octave above 440 Hz) as the upper boundary.
+
+See footnote for one solution.
+footnote::
+The method rrand does the job:
+CODE::
+(freq: rrand(440, 880)).play;
+::
+Watch the Post window to see the different 'freq' values chosen every time.
+::
+
+
+SECTION::4
+Write a line of code that plays one note using SuperCollider's default instrument. Every time you evaluate the line, the code should randomly choose a note from a C minor triad (midinotes 60, 63, 67).
+
+See footnote for one solution.
+footnote::
+A few solutions are presented below:
+CODE::
+(freq: [60, 63, 67].choose.midicps).play;
+// or
+(midinote: [60, 63, 67].choose).play;
+// or
+(note: [0, 3, 7].choose).play;
+::
+::
+
+SECTION::5
+Select the entire block of code below, evaluate it, and take a look at what shows up in the Post window. If you like, use Control + Shift + P to clean up the Post window first.
+CODE::
+(
+"This is the first line".postln;
+8 + 8;
+"This is the last line".postln;
+)
+::
+ Without changing the order of the lines, change the code above so that:
+LIST::
+## the result of the second line (16) gets posted too;
+## the last line is posted only once.
+::
+
+See footnote for one solution.
+footnote::
+When you execute code in SC, it always posts whatever was the last thing executed, and that's why the last line was posted twice. Because the last line is last thing to be executed in that block of code, it will get posted anyway; so we can remove the postln.
+As for the middle line (8 + 8), it did get evaluated, we just didn't see the result. Simply add a postln to it to print its result in the Post window. Note that parentheses are needed: we want the addition 8 + 8 to happen first, and the postln (of the result) to happen second.
+CODE::
+(
+"Hello World".postln;
+(8 + 8).postln;
+"This is the last line";
+)
+::
+::
+
+
+
+SECTION::6
+The code below plays the notes of a Cm7 chord always in the same order. Make it play the same notes in any random order. Also, change the legato value to make all notes EMPHASIS::staccato:: (detached from each other).
+CODE::
+Pbind(
+    \midinote, Pseq([60, 63, 67, 70], inf),
+    \dur, 0.2,
+    \legato, 1
+).play;
+::
+See footnote for one solution.
+footnote::
+Just use Prand instead of Pseq.
+CODE::
+Pbind(
+    \midinote, Prand([60, 63, 67, 70], inf),
+    \dur, 0.2,
+    \legato, 0.1
+).play;
+::
+::
+
+SECTION::7
+Write a simple function to play a note of any given frequency.
+Assign the function to the variable 'f', so that lines such as
+CODE::
+f.value(440);
+f.value(512);
+f.value(950);
+::
+will play a short note with the provided frequency in Herz.
+
+See footnote for one solution.
+footnote::
+CODE::
+f = { arg myfreq; (freq: myfreq).play };
+::
+::
+
+
+SECTION::8
+Here's a short ascending scale going up by quarter tones from midinote 60 to midinote 63.
+CODE::
+(
+var scale = [60, 60.5, 61, 61.5, 62, 62.5, 63];
+
+Pbind(
+    \midinote, Pseq(scale, 1),
+    \dur, 1/3
+).play;
+)
+::
+Make it play the same scale, but EMPHASIS::descending:: instead of ascending.
+
+See footnote for one solution.
+footnote::
+Simply apply the method .reverse to the list of MIDI notes.
+CODE::
+(
+var scale = [60, 60.5, 61, 61.5, 62, 62.5, 63].reverse;
+
+Pbind(
+    \midinote, Pseq(scale, 1),
+    \dur, 1/3
+).play;
+)
+::
+::
+
+
+SECTION::9
+Write one line of code that plays a continuous sine wave. Use your mouse or trackpad to control frequency and amplitude of the sound (horizontal motion controlling frequency, vertical motion controlling amplitude).
+
+See footnote for one solution.
+footnote::
+CODE::
+{ SinOsc.ar(freq: MouseX.kr(100, 1000), mul: MouseY.kr(0.1, 0.5)) }.play;
+::
+::
+
+SECTION::10
+Suppose you are trying to create a collection of 11 notes picked randomly between C4 (midinote 60) and C5 (midinote 72). The code below is almost there, but still doesn't do the job. What is wrong? How to fix it?
+CODE::
+Array.fill(11, rrand(60, 72));
+::
+
+See footnote for one solution.
+footnote:: Enclose rrand in curly braces, making it a function. This way it is evaluated again 11 times, instead of just once at the beginning.
+CODE::
+Array.fill(11, { rrand(60, 72) } );
+::
+::
+
+SECTION::11
+Just like in the previous exercise, you are trying to create a sequence of 11 notes picked randomly between C4 (midinote 60) and C5 (midinote 72). This time, however, you don't want to use the Array.fill construction. You are writing a Pbind, and there is a straightforward way to accomplish this task with one of the members of the Pattern family. Write it in below.
+CODE::
+Pbind(
+    \midinote, /*what do you write here?*/,
+    \dur, 0.2
+).play;
+::
+
+See footnote for the solution.
+footnote:: Use Pwhite:
+CODE::
+Pbind(
+    \midinote, Pwhite(60, 72, 11),
+    \dur, 0.2
+).play;::
+::
+::
+
+SECTION::12
+Create a continuous stream of pink noise. Use Pan2 to slowly move the sound between the left and right channels. Use a sine oscillator as your control for panning the noise.
+
+See footnote for one solution.
+footnote::
+CODE::
+{ Pan2.ar(PinkNoise.ar(0.2), SinOsc.kr(0.5)) }.play;
+::
+::
+
+SECTION::13
+Use Mix.fill to create a cluster of sine tones. Use the code below as a starting point. The variable 'n' specifies the number of sine tones to be mixed together. The frequency of each tone should be randomly chosen between 100 and 1000 Hz. Make sure to scale amplitudes accordingly so that the sum is never greater than 1.
+CODE::
+(
+var n = 8;
+{ Mix.fill(                  ) }.play;
+)
+::
+See footnote for one solution.
+footnote::
+See LINK::Tutorials/Getting-Started/07-Mix-it-Up##this page:: of the EMPHASIS::Getting Started:: tutorial.
+CODE::
+(
+var n = 8;
+{ Mix.fill(n, { SinOsc.ar(freq: rrand(100, 1000), mul: 1/n) }) }.play;
+)
+::
+::
+
+
+
+SECTION::14
+Write a simple SynthDef so that the block of code below will produce a chord of sawtooth waves. The SynthDef should output the same signal on both channels (left and right).
+CODE::
+(
+Synth("mySynth", [\freq, 41.midicps, \amp, 0.05]);
+Synth("mySynth", [\freq, 48.midicps, \amp, 0.07]);
+Synth("mySynth", [\freq, 60.1.midicps, \amp, 0.03]);
+Synth("mySynth", [\freq, 62.midicps, \amp, 0.04]);
+Synth("mySynth", [\freq, 69.midicps, \amp, 0.03]);
+)
+::
+In addition, the line below should also work, producing a single default tone:
+CODE::
+Synth("mySynth");
+::
+
+See footnote for one solution.
+footnote::
+CODE::
+SynthDef("mySynth", {arg freq = 440, amp = 0.05;
+    Out.ar(0, Saw.ar([freq, freq], amp));
+}).add;
+::
+::
+
+
+
+SECTION::15
+Using the Pbind below as a starting point, make the following changes:
+LIST::
+##add a frequency offset to each note. The offset should be randomly chosen between 10 and 20 Hz each time;
+##durations should be: [0.2, 0.4] played twice, then [0.3, 0.3, 0.6] played once; and repeat this whole sequence 3 times, then stop.
+::
+CODE::
+Pbind(
+    \freq, Pseq( [1/1, 3/2, 4/3, 9/8, 16/9, 5/4, 8/5], 1) * 440,
+    \dur, Prand([0.2, 0.4, 0.3], inf)
+).play;
+::
+
+The Pbind above has been borrowed from LINK::http://sc3howto.blogspot.com/2010/06/pbinds.html
+##this online tutorial::.
+
+See footnote for one solution.
+footnote::
+CODE::
+Pbind(
+    \freq, Pseq( [1/1, 3/2, 4/3, 9/8, 16/9, 5/4, 8/5], inf) * 440 + Pwhite(10, 20),
+    \dur, Pseq( [Pseq([0.2, 0.4], 2), Pseq([0.3, 0.3, 0.6], 1) ], 3)
+).play;
+
+/*
+Note that it stops after 3 repeats thanks to the number 3 inside the main Pseq in \dur. The solution above uses 'inf' for the Pseq in \freq; one could write '3' there as well, and the result would be the same; but I tend to prefer having only one clear terminating condition inside a Pbind.
+*/
+::
+::
+
+
+SECTION::16
+Start with the same Pbind from the previous exercise:
+CODE::
+Pbind(
+    \freq, Pseq( [1/1, 3/2, 4/3, 9/8, 16/9, 5/4, 8/5], 1) * 440,
+    \dur, Prand([0.2, 0.4, 0.3], inf)
+).play;
+::
+Make it play a bass line with the following durations:
+
+[1/2, 1/2, 1/2, 1/2, 3/4, 3/4, 1/2]
+
+Then make it play twice as fast.
+
+Finally, using the \legato key, make all notes staccato.
+
+NOTE::If you are using laptop speakers, you may not hear your bass notes. Use good headphones or loudspeakers instead.::
+
+See footnote for one solution.
+footnote::
+CODE::
+Pbind(
+    \freq,  Pseq([1, 3/2, 4/3, 9/8, 16/9, 5/4, 8/5] * 40 , inf),
+    \dur,  Pseq([1/2, 1/2, 1/2, 1/2, 3/4, 3/4, 1/2] * 0.5, 10),
+    \amp, 0.5,
+    \legato, 0.1
+).play;
+::
+::
+
+
+SECTION::17
+Play an ascending scale that:
+
+LIST::
+##starts one octave below middle C
+##has a total of 24 notes
+##goes up mostly by stepwise motion
+##all notes have a duration of 0.1
+::
+Use Pbind with the default instrument.
+
+See footnote for one solution.
+footnote::
+One octave below middle C is midinote 48.
+Pseries creates the arithmetic series of numbers.
+Pwrand controls the step. "Mostly stepwise" can have several interpretations; below it is interpreted as whole tone or semitone 80% of the time, and a minor third 20% of the time.
+CODE::
+Pbind(
+    \midinote, Pseries(
+        start: 48,
+        step: Pwrand([1, 2, 3], [0.4, 0.4, 0.2], inf),
+        length: 24),
+    \dur, 0.1
+).play;
+::
+::
+
+
+SECTION::18
+Write a Pbind to achieve the following musical goals:
+LIST::
+##play a three-octave descending scale (use Pseries);
+##scale type: harmonic minor;
+##scale has a decreasing series of durations (EMPHASIS::accelerando::): the first note to be played should have a duration of 1 second, and each successive note should have a shorter duration (use Pgeom);
+##create the following accent pattern for the entire scale: STRONG::mf::, p, p, STRONG::mf::, p, p, STRONG::mf::, p, p, etc (use Pser);
+##all notes staccato.
+::
+
+See footnote for one solution.
+footnote::
+Using \degree, we need 22 notes to complete 3 octaves (7 + 7 + 7 + 1). The Pbind stops when Pser is done with its 22 values.
+CODE::
+Pbind(
+    \scale, Scale.harmonicMinor,
+    \degree, Pseries(7, -1),
+    \dur, Pgeom(1, 0.9),
+    \amp, Pser([0.3, 0.1, 0.1], 22),
+    \legato, 0.3
+).play;
+::
+::
+
+SECTION::19
+Suppose you need a SynthDef that picks a random frequency and random amplitude for every new Synth that is created. You might be tempted to write this:
+CODE::
+SynthDef("random", {
+    Out.ar(0, SinOsc.ar(
+        freq: rrand(440, 880),
+        mul: rrand(0.1, 0.5)));
+}).add;
+::
+The problem is that this doesn't work as desired, because it always plays the same note every time a new Synth is called:
+CODE::
+x = Synth("random");
+y = Synth("random");
+z = Synth("random");
+x.free; y.free; z.free;
+::
+
+What is the problem? How to fix it? (Remember, the goal is to have a new random frequency and amplitude selected every time a new Synth is created).
+
+See footnote for one solution.
+footnote::
+The problem has to do with the differences between Server and Language. In the first SynthDef, rrand is evaluated only once when the SynthDef is created. In order to have a new random number being generated for every Synth, we have to use the UGen Rand:
+CODE::
+SynthDef("random2", {
+    Out.ar(0, SinOsc.ar(
+        freq: Rand(440, 880),
+        mul: Rand(0.1, 0.5)));
+}).add;
+x = Synth("random2");
+y = Synth("random2");
+z = Synth("random2");
+x.free; y.free; z.free;
+::
+Example adapted from Getting Started Tutorial - LINK::Tutorials/Getting-Started/10-SynthDefs-and-Synths::. Check it out for more information.
+::
+
+
+SECTION::20
+The SynthDef below defines an instrument that plays a continuous sound (a mix of three slightly detuned sawtooth waves).
+CODE::
+SynthDef("ex20", {arg freq = 440, amp = 0.1;
+    var snd;
+    snd = Saw.ar(freq*[1, 0.99, 1.015], amp);
+    snd = Splay.ar(snd);
+    Out.ar(0, snd);
+}).add;
+
+x = Synth("ex20");
+x.free;
+y = Synth("ex20", [\freq, 200, \amp, 0.05]);
+y.free;
+::
+Add a percussive envelope to the SynthDef, so that you can play it like this (arguments \att and \rel stand for attack and release times):
+CODE::
+x = Synth("ex20", [\freq, 200, \rel, 4]);
+y = Synth("ex20", [\att, 0.3, \rel, 3.1]);
+z = Synth("ex20"); // this one should fade out in 2s.
+::
+Make sure each synth frees itself when the percussive envelope is finished.
+
+See footnote for one solution.
+footnote::
+Adding a percussive envelope with doneAction: 2 to a SynthDef:
+CODE::
+SynthDef("ex20b", {arg freq = 440, amp = 0.1, att = 0.01, rel = 2;
+    var snd, env;
+    env = EnvGen.kr(Env.perc(att, rel, amp), doneAction: 2);
+    snd = Saw.ar(freq*[1, 0.99, 1.015], env);
+    snd = Splay.ar(snd);
+    Out.ar(0, snd);
+}).add;
+
+x = Synth("ex20b", [\freq, 200, \rel, 4]);
+y = Synth("ex20b", [\att, 0.2, \rel, 9.1]);
+z = Synth("ex20b"); // default release of 2s.
+::
+::
+
+
+SECTION::21
+Take the following sequence of MIDI notes:
+CODE::
+~notes = [60, 64, 67, 60, 62, 65, 59, 61, 65, 59, 60, 64];
+::
+First, write a Pbind to play these notes in sequence once. Then, always using the same notes, change the code to play a sequence of three-note chords (every three sequential notes forming one chord).
+
+See footnote for one solution.
+footnote::
+Playing chords from a Pbind.
+CODE::
+// First play notes one after the other:
+Pbind(
+    \midinote, Pseq(~notes),
+    \dur, 1/2
+).play;
+
+// Now, play as chords (grouping every 3 adjacent notes together):
+Pbind(
+    \midinote, Pseq(~notes.clump(3)),
+    \dur, 1/2
+).play;
+
+// The above is the same as:
+Pbind(
+    \midinote, Pseq([[60, 64, 67], [60, 62, 65], [59, 61, 65], [59, 60, 64]]),
+    \dur, 1/2
+).play;
+::
+::
+
+
+
+SECTION::22
+Here's a simple SynthDef that plays a steady tone:
+CODE::
+// Define the synth
+SynthDef("steady", {arg midinote = 60, amp = 0.1;
+    var freq = midinote.midicps;
+    var    snd = SinOsc.ar(freq: freq, mul: amp);
+    Out.ar(0, [snd, snd]);
+}).add;
+::
+Try it:
+CODE::
+x = Synth("steady");
+x.free;
+::
+Write a new SynthDef (let's call it "vib") using a sine oscillator at control rate to add vibrato to the sound. You should be able to specify vibrato speed (in cycles per second) and vibrato amount (in semitones) like this:
+CODE::
+x = Synth("vib", [\midinote, 62, \vspeed, 4, \vamount, 1]);
+y = Synth("vib", [\vspeed, 8.3, \vamount, 0.5]);
+x.free; y.free;
+::
+STRONG::How to interpret the vibrato amount parameter for this exercise::: for example, a D (midinote 62) with a vibrato amount of 1 means the note should deviate one semitone up (from D to D#) and one semitone down (from D to Db). A vibrato amount of 12 should make the note deviate one full octave up and one full octave down, etc.
+
+See footnote for one solution.
+footnote::
+Creating vibrato:
+CODE::
+SynthDef("vib", {arg midinote = 60, amp = 0.1, vspeed = 10, vamount = 1;
+    var deviation, freq, snd;
+    deviation = SinOsc.kr(freq: vspeed, mul: vamount);
+    freq = (midinote + deviation).midicps;
+    snd = SinOsc.ar(freq: freq, mul: amp);
+    Out.ar(0, [snd, snd]);
+}).add;
+
+x = Synth("vib", [\midinote, 76, \vspeed, 7]);
+x.free;
+y = Synth("vib", [\vspeed, 4.3, \vamount, 3.1]);
+y.free;
+::
+By calculating the deviation in semitones and adding it directly to a midinote value EMPHASIS::before:: converting it to frequency, we make sure the deviation will be the same in both directions (up and down). Compare with the following:
+
+CODE::
+SynthDef("vib-unequal", {arg midinote = 60, amp = 0.1, vspeed = 10, vamountHz = 20;
+    var deviation, freq, snd;
+    deviation = SinOsc.kr(freq: vspeed, mul: vamountHz);
+    // add deviation to freq in Herz:
+    freq = midinote.midicps + deviation;
+    snd = SinOsc.ar(freq: freq, mul: amp);
+    Out.ar(0, [snd, snd]);
+}).add;
+
+a = Synth("vib-unequal", [\vamountHz, 15, \vspeed, 7]);
+a.free;
+b = Synth("vib-unequal", [\midinote, 72, \vspeed, 5, \vamountHz, 100]);
+b.free;
+c = Synth("vib-unequal", [\midinote, 48, \vspeed, 5, \vamountHz, 100]);
+c.free;
+::
+
+Implementing vibrato in this way (directly in Hz) has the following properties:
+LIST::
+##the deviation upwards will not be the same as downwards (for example, when oscillating 20 Hz up and down from a center frequency of 200 Hz, the pitch interval between 180 and 200 will be larger than the pitch interval between 200 and 220);
+##one same deviation amount will result in wildly different amounts of vibrato depending on the register. Compare synths b and c just above.
+::
+::
+
+
+SECTION::23
+Here's a simple hihat SynthDef:
+CODE::
+SynthDef("hihat", {arg amp = 0.5, att = 0.01, rel = 0.2, ffreq = 6000;
+    var snd = WhiteNoise.ar(amp);
+    var env = EnvGen.kr(Env.perc(att, rel, amp), doneAction: 2);
+    snd = HPF.ar(snd * env, ffreq);
+    Out.ar(0, [snd, snd]);
+}).add;
+::
+Try it:
+CODE::
+Synth("hihat");
+Synth("hihat", [\rel, 0.05, \ffreq, 10000]);
+::
+Write a Pbind to play this hihat instrument. Try to create a difference between a closed hihat and an open hihat.
+
+See footnote for one solution.
+footnote::
+Playing a hihat SynthDef.
+CODE::
+Pbind(
+    \instrument, "hihat",
+    \dur, 0.2,
+    \ffreq, 9000,
+    \rel, Pseq([0.05, 0.05, 0.05, 0.4], inf),
+    \amp, 0.5
+).play;
+::
+::
+
+
+SECTION::24
+The code below doesn't make any sound - it simply writes MouseX.kr values into control bus 20. The values are between 0 and 1 (the default, since no other values are provided).
+CODE::
+{ Out.kr(20, MouseX.kr) }.play;
+::
+Write a single synth that does all of the following simultaneously:
+LIST::
+##plays a soft sine wave with frequency controlled by the horizontal motion of your mouse. The left side of the screen should be a low frequency of your choice, and the right side of the screen should be 1000 Hz;
+##plays a second and softer sine wave that sounds significantly higher in pitch than the previous one; with its frequency also controlled by horizontal motion of the mouse; but with glissando direction reversed: the left side of the screen should be a very high frequency of your choice, and the right side of the screen should be 1000 Hz.
+##plays an extremely soft stream of white noise, the amplitude of which is also controlled by the horizontal movement of the mouse. The white noise should fade out to silence as the cursor approaches either side of the screen (extreme left or right).
+::
+
+See footnote for one solution.
+footnote::
+Using a control bus, and scaling numbers accordingly.
+CODE::
+{
+    var a, b, c, mouse;
+    mouse = In.kr(20);
+    a = SinOsc.ar(
+        freq: mouse.linlin(0, 1, 100, 1000),
+        mul: 0.01);
+    b = SinOsc.ar(
+        freq: mouse.linlin(0, 1, 9999, 1000),
+        mul: 0.005);
+    c = WhiteNoise.ar(mouse.linlin(0, 1, -0.005, 0.005));
+    Out.ar(0, a + b + c);
+}.play;
+
+// If you don't hear the gliss when you move the cursor
+// it's probably because you forgot to run this:
+{ Out.kr(20, MouseX.kr) }.play
+::
+::
+
+
+SECTION::25
+Take your solution to the previous exercise as starting point. Make the following changes:
+LIST::
+##make it play the same signal on both channels (left and right);
+##multiply the final mix by a pulse oscillator so that we no longer hear a continuous sound but rather a sequence of short "notes" (pulses). A new random frequency of the pulses (between 1-20 pulses per second) should be chosen automatically every second.
+::
+
+See footnote for one solution.
+footnote::
+LFPulse used as amplitude envelope.
+LFNoise0 used to control the freq of LFPulse.
+LFPulse width of 0.1 makes "short notes".
+CODE::
+{
+    var a, b, c, mix, mouse;
+    mouse = In.kr(20);
+    a = SinOsc.ar(mouse.linlin(0, 1, 100, 1000), 0, 0.1);
+    b = SinOsc.ar(mouse.linlin(0, 1, 9999, 1000), 0, 0.05);
+    c = WhiteNoise.ar(mouse.linlin(0, 1, -0.05, 0.05));
+    mix = a + b + c * LFPulse.kr(LFNoise0.kr(1).range(1, 20), width: 0.1);
+    Out.ar(0, [mix, mix]);
+}.play;
+
+// If you don't hear the gliss when you move the cursor
+// it's probably because you forgot to run this:
+{ Out.kr(20, MouseX.kr) }.play
+::
+::
+
+
+SECTION::26
+Here you have two synth definitions. Both produce sequences of short staccato notes.
+CODE::
+SynthDef("sinegrain",
+    { arg out = 0, amp = 0.5;
+        var env;
+        env = EnvGen.kr(Env.perc(0.01, 0.1, amp), Dust.kr(1));
+        Out.ar(out, SinOsc.ar(LFNoise0.kr(1).range(1900, 2300), 0, env))
+    }).add;
+
+SynthDef("glisspulse", {arg out = 0, amp = 0.5;
+    var mouse, a, b, c, env, snd;
+    mouse = MouseX.kr;
+    a = SinOsc.ar(mouse.linlin(0, 1, 500, 1000), 0, 0.2);
+    b = SinOsc.ar(mouse.linlin(0, 1, 9999, 1000), 0, 0.1);
+    c = WhiteNoise.ar(mouse.linlin(0, 1, -0.1, 0.1));
+    env = LFPulse.kr(LFNoise1.kr(1).range(1/2, 3), width: 0.05);
+    snd = (a + b + c) * env * amp;
+    Out.ar(out, snd);
+}).add;
+::
+Try them out:
+CODE::
+x = Synth("sinegrain")
+y = Synth("glisspulse");
+x.free; y.free;
+::
+Write a SynthDef that takes any incoming sound and adds reverb to it. Play the two instruments above ("sinegrain" and "glisspulse") through the reverb synth simultaneously. Do not change "sinegrain" and "glisspulse" in any way.
+
+See footnote for one solution.
+footnote::
+CODE::
+SynthDef("reverb", {arg inbus, mix = 0.4;
+    var in, snd;
+    in = In.ar(inbus);
+    snd = FreeVerb.ar(
+        in: in,
+        mix: mix,
+        room: 0.8,
+        damp: 0.5);
+    Out.ar(0, [snd, snd]);
+}).add;
+
+// Create a bus
+b = Bus.audio(s, 1);
+
+// Play synths into the new bus
+x = Synth("sinegrain", [\out, b])
+y = Synth("glisspulse", [\out, b]);
+
+// Start the reverb effect:
+r = Synth("reverb", [\inbus, b], addAction: \addToTail);
+
+// Important: note that the reverb synth has to be placed
+// AFTER the two other synths. Take a look at this graph
+// (while all synths are running):
+
+s.plotTree; // read the graph from top to bottom
+
+x.free; y.free; r.free;
+::
+For more info, see LINK::Guides/Order-of-execution::.
+::
+
+
+
+
+SECTION::27
+Fill in the blanks of the synth below to create two glissando sine waves (one ascending, the other descending). The first sine wave should start at 100 Hz and arrive at 440 Hz over 5 seconds, playing on the left channel. The second sine wave should start at 900 Hz and arrive at 443 Hz over 6 seconds, playing on the right channel. The amplitude (same for both) should decrease from 0.4 to 0.0 in 9 seconds.
+
+CODE::
+(
+{SinOsc.ar(
+    freq: Line.kr(
+        start:
+        end:
+        dur:
+    mul:
+)}.play;
+)
+::
+
+See footnote for one solution.
+footnote::
+Using multichannel expansion.
+CODE::
+(
+{SinOsc.ar(
+    freq: Line.kr(
+        start: [100, 900],
+        end: [440, 443],
+        dur: [5, 6]),
+    mul: Line.kr(0.4, 0, 10))
+}.play;
+)
+::
+::
+
+
+SECTION::28
+A basic kick drum sound can be created with a single sine wave burst in the low register, with a percussive amplitude envelope (very short attack, fairly short release time), and a slight glissando downwards. Create a SynthDef following these guidelines, and write a Pbind to play your new instrument.
+
+See footnote for one solution.
+footnote::
+CODE::
+// Synth definition:
+SynthDef("kick", {arg amp = 0.3, sinfreq = 60, glissfactor = 0.9, att = 0.001, rel = 0.3;
+    var gliss = XLine.kr(sinfreq, sinfreq * glissfactor, rel);
+    var snd = SinOsc.ar(gliss);
+    var env = EnvGen.kr(Env.perc(att, rel, amp), doneAction: 2);
+    snd = snd * env;
+    Out.ar(0, snd!2);
+}).add;
+
+// Playing it with Pbind:
+Pbind(
+    \instrument, "kick",
+    \dur, Pseq([1/2, 1/2, 1/3], inf),
+    \amp, 0.5,
+    \sinfreq, 60
+).play;
+::
+::
+
+SECTION::29
+Create a short "audio tester" program that sends short bursts of pink noise to any specified channel. Suppose you would like to test an 8-channel set up, and you want this instrument to play continuously going around the eight channels (i.e., noise bursts will keep circling from channel 1 through channel 8). You should also be able to specify speed (for example, one noise burst every 1/2 second) and amplitude.
+
+First write a short SynthDef that plays one single noise burst with a percussive envelope. The synth should free itself after the envelope is finished.
+
+Then write a Pbind to play the instrument and the 8-channel test.
+
+Bonus: rewrite the playing mechanism as a Routine instead of a Pbind.
+
+See footnote for one solution.
+footnote::
+CODE::
+// Audiotester
+// First, create the SynthDef:
+SynthDef("audiotester", { arg out = 0, amp = 0.1;
+    var snd = PinkNoise.ar(amp) * EnvGen.kr(Env.perc, doneAction: 2);
+    Out.ar(out, snd);
+}).add;
+
+
+// Play it going around 8 channels (SC busses 0 to 7):
+Pbind(
+    \instrument, "audiotester",
+    \dur, 0.6,
+    \out, Pseq((0..7), inf)
+).play;
+
+
+// Watch it here:
+s.meter;
+
+// Notice the shortcut notation for creating an Array
+// with an arithmetic series from 0 to 7:
+
+(0..8); // evaluate, check Post window
+
+// Now using a Routine instead of a Pbind.
+// Define the Routine:
+r = Routine({
+    loop({ 8.do(
+        {arg i;
+            Synth("audiotester", [\out, i]);
+            0.5.wait;
+        })
+    })
+});
+// Play it:
+r.play;
+r.stop;
+
+// While we are at it, here's a shortcut notation for the above:
+{
+    loop({ 8.do(
+        {arg i;
+            Synth("audiotester", [\out, i]);
+            0.5.wait;
+        })
+    })
+}.fork;
+::
+::
+
+SECTION::30
+Write a SynthDef called "adsr" made of white noise going through a very sharp band pass filter. Each note should have an ADSR envelope with default values att = 0.1, dec = 1, sus = 0.3, rel = 2. Create a short phrase with this instrument to play 4 notes following this descriptive score:
+LIST::
+##first note: frequency = 1700 Hz, amplitude = 0.5, attack = 0.1 seconds;
+##half a second later comes the second note: frequency = 900 Hz, amplitude = 0.9, attack = 1.2 seconds, release = 5 seconds;
+##half a second later comes the third note: frequency = 2300 Hz, amplitude = 0.8, release = 5 seconds;
+##0.8 second later comes the fourth note: frequency = 300 Hz, amplitude = 0.9, attack = 4.5 seconds, sustain = 0.2, release = 5 seconds;
+##wait one second, release second note;
+##wait 2 seconds, release fourth note;
+##wait 1 more second, release second note;
+##wait another half a second, release first note.
+::
+
+
+
+
+See footnote for one solution.
+footnote::
+CODE::
+// Evaluate SynthDef:
+SynthDef("adsr", {
+    arg freq = 440,
+        amp = 0.5,
+        gate = 1,
+        att = 0.1, dec = 1, sus = 0.3, rel = 2;
+
+    var env = EnvGen.ar(
+        envelope: Env.adsr(att, dec, sus, rel),
+        gate: gate,
+        levelScale: amp * 5,
+        doneAction: 2);
+
+    var snd = BPF.ar(
+        in: WhiteNoise.ar,
+        freq: freq,
+        rq: 0.005);
+
+    snd = snd * env;
+
+    Out.ar(0, [snd, snd]);
+ }).add;
+
+// Play score with a Routine:
+{
+    w = Synth("adsr", [\freq, 1700, \amp, 0.5, \att, 0.1]);
+    0.5.wait;
+
+    x = Synth("adsr", [\freq, 900, \amp, 0.9, \att, 1.2, \rel, 5]);
+    0.5.wait;
+
+    y = Synth("adsr", [\freq, 2300, \amp, 0.8, \rel, 5]);
+    0.8.wait;
+
+    z = Synth("adsr", [\freq, 300, \amp, 0.9, \att, 4.5, \sus, 0.2, \rel, 8]);
+    1.wait;
+
+    x.release;
+    2.wait;
+    z.release;
+    1.wait;
+    y.release;
+    0.5.wait;
+    w.release;
+
+}.fork;
+
+
+::
+::
+
+
+SECTION::31
+Here's a Pbind taken from the tutorial EMPHASIS::A Practical Guide To Patterns::, LINK::Tutorials/A-Practical-Guide/PG_02_Basic_Vocabulary:::
+CODE::
+// Flock of Seagulls!
+(
+p = Pbind(
+    \degree, Pslide((-6, -4 .. 12), 8, 3, 1, 0),
+    \dur, Pseq([0.1, 0.1, 0.2], inf),
+    \sustain, 0.15
+).play;
+)
+::
+Record the output of this pattern into a short audio file (wave of aiff). Then play it back in five simultaenous layers:
+LIST::
+##one with no transposition, but in reverse;
+##another one speeding up to 1.5 over 4 seconds;
+##another one speeding up to 1.5 over 5 seconds;
+##another one slowing down to 0.5 over 7 seconds;
+##another one an octave down and in reverse.
+::
+Loop playback for all four layers.
+Spread the layers evenly over the stereo field.
+
+See footnote for one solution.
+footnote:: Recording the output of SuperCollider into a sound file, then playing back the sound file at different speeds. Taking advantage of LINK::Guides/Multichannel-Expansion:: to create the five layers.
+CODE::
+// Start recording:
+s.record;
+
+// Start the pattern:
+Pbind(
+    \degree, Pslide((-6, -4 .. 12), 8, 3, 1, 0),
+    \dur, Pseq([0.1, 0.1, 0.2], inf),
+    \sustain, 0.15
+).play;
+
+// When it's done, stop recording:
+s.stopRecording;
+
+// Find the file in the right directory,
+// then load it into a buffer.
+// (SC printed the path of the folder
+// when you evaluated the line s.record)
+
+b = Buffer.read(s, "/home/ruviaro/.local/share/SuperCollider/Recordings/SC_131227_171915.aiff");
+
+(
+{
+    var snd, reversed, speeding, slowing, octave;
+    reversed = -1;
+    speeding = Line.kr(1, 1.5, [4, 5]);
+    slowing = Line.kr(1, 0.5, 7);
+    octave = -0.5;
+    snd = PlayBuf.ar(
+        numChannels: 2,
+        bufnum: b,
+        rate: [reversed, slowing, speeding, octave],
+        loop: 1);
+    Out.ar(0, Splay.ar(snd));
+}.play
+)
+
+// Same as above, but condensed into one long line:
+
+{ Splay.ar(PlayBuf.ar(2, b, [-1, -0.5, Line.kr(1, [0.5, 1.5, 1.5], [7, 4, 5])], loop: 1)) }.play;
+
+::
+::
+
+
+
+SECTION::32
+Create a synthetic "wind chimes" texture with the following characteristics:
+LIST::
+##a total of 16 chimes are triggered randomly and independently;
+##each chime plays a single harmonic of the note D2 (MIDI note 38), from the first sixteen partials;
+##density of chimes (number of notes per second) is controlled by a MouseX.kr;
+##basic chime sound is a simple sine wave with a percussive envelope (release time of 4 seconds);
+##chimes are spread over the stereo field: 1st chime panned to the extreme left position, 16th chime to extreme right position; all other chimes evenly spaced in between.
+::
+
+See footnote for one solution.
+footnote::
+Harmonic series wind chimes with percussive sine waves:
+CODE::
+(
+var n = 16; // number of chimes
+
+{
+    Splay.ar(Array.fill(n, { arg i;
+        SinOsc.ar(
+            freq: 38.midicps * (i+1),
+            mul: 0.6)
+        * EnvGen.kr(
+            envelope: Env.perc(0.01, 4, curve: -8),
+            gate: Dust.kr(MouseX.kr(0.01, 0.5)))}))
+}.play;
+)
+
+// Array.fill takes care of creating an array of 16 sine oscillators, each tuned to a partial of D2.
+
+// Dust.kr triggers the amplitude envelopes of each chime. Note that the envelope multiplication happens inside the Array.fill function, so in fact it expands to sixteen independent Dust.kr controls.
+
+// MouseX.kr controls the density of Dust.kr.
+
+// Splay.ar takes care of spreading the sixteen oscillators on the stereo field.
+::
+::
+
+
+SECTION::33
+Here's an example from the Place help file:
+CODE::
+(
+SynthDef("help-sinegrain",
+    { arg out = 0, freq = 440, sustain = 0.05;
+        var env;
+        env = EnvGen.kr(Env.perc(0.01, sustain, 0.2), doneAction: 2);
+        Out.ar(out, SinOsc.ar(freq, 0, env))
+    }).add;
+)
+
+(
+c = Place([0, 0, [0, 4, 7], [1, 5, 8], [2, 6, 9]], inf) + 67;
+x = c.asStream;
+Routine({
+    loop({
+        Synth("help-sinegrain", [\freq, x.next.midicps]);
+        0.17.wait;
+    })
+}).play;
+)
+::
+Rewrite the second block of code (the Routine) as a Pbind that plays exactly the same thing.
+
+Bonus challenges:
+LIST::
+##change the SynthDef so that you can control the amplitude of each note from inside the Pbind;
+##modify your Pbind so that each note is randomly sent to either left or right channel.
+::
+
+See footnote for one solution.
+footnote::
+Rewriting a given Routine as a Pbind:
+CODE::
+Pbind(
+    \instrument, "help-sinegrain",
+    \midinote, Place([0, 0, [0, 4, 7], [1, 5, 8], [2, 6, 9]], inf) + 67,
+    \dur, 0.17
+).play;
+::
+Bonus challenges:
+CODE::
+// Add amp argument:
+(
+SynthDef("help-sinegrain-2",
+    { arg out = 0, freq = 440, sustain = 0.05, amp = 0.2;
+        var env;
+        env = EnvGen.kr(Env.perc(0.01, sustain, amp), doneAction: 2);
+        Out.ar(out, SinOsc.ar(freq, 0, env))
+    }).add;
+)
+// Amp control, plus out bus control (left/right choice):
+Pbind(
+    \instrument, "help-sinegrain-2",
+    \midinote, Place([0, 0, [0, 4, 7], [1, 5, 8], [2, 6, 9]], inf) + 67,
+    \amp, Pwhite(0.1, 0.5),
+    \dur, 0.17,
+    \out, Pwhite(0, 1)
+).play;
+::
+::
+
+
+SECTION::34
+The two identical Pinds below will play the 12-note pattern from Steve Reich's Piano Phase. Leave the first Pbind as is, and modify the second Pbind so that it speeds up very gradually (phasing effect). In other words, the durations in the second Pbind have to become gradually shorter.
+CODE::
+(
+
+var notes = [4, 6, 11, 13, 14, 6, 4, 13, 11, 6, 14, 13];
+
+Pbind(
+    \note, Pseq(notes, 30),
+    \dur, 0.15
+).play;
+
+Pbind(
+    \note, Pseq(notes, 30),
+    \dur, 0.15,
+).play;
+
+)
+::
+See footnote for one solution.
+footnote::
+The solution below uses Pseries to generate a descending series of numbers like [1, 0.995, 0.990, 0.985, etc]. The initially fixed duration of the second Pbind (0.15) will now be, in time, multiplied by each of these numbers. As a result, the duration becomes slightly shorter every time.
+CODE::
+(
+
+var notes = [4, 6, 11, 13, 14, 6, 4, 13, 11, 6, 14, 13];
+
+// This one remains constant:
+Pbind(
+    \note, Pseq(notes, 30),
+    \dur, 0.15
+).play;
+
+// This one speeds up gradually:
+Pbind(
+    \note, Pseq(notes, 30),
+    \dur, 0.15 * Pstutter(notes.size * 2, Pseries(1, -0.005, inf)),
+).play;
+
+)
+::
+Notice the use of Pstutter: it repeats ("stutters") 24 times the value coming out of Pseries, and only then requests the next Pseries value. This way the second Pbind player waits 2 bars before moving on to the next level of speeding up. Without this Pstutter trick, the incremental decrease in duration would happen EMPHASIS::every note:: instead of every 2 bars. Listen to a version without Pstutter -- the phasing increases note by note:
+CODE::
+( // without Pstutter
+
+var notes = [4, 6, 11, 13, 14, 6, 4, 13, 11, 6, 14, 13];
+
+// This one remains constant:
+Pbind(
+    \note, Pseq(notes, 30),
+    \dur, 0.15
+).play;
+
+// This one speeds up gradually:
+Pbind(
+    \note, Pseq(notes, 30),
+    \dur, 0.15 * Pseries(1, -0.005, inf),
+).play;
+
+)
+::
+::
+
+
+SECTION::35
+Here's a SynthDef that uses Pluck (Karplus-Strong synthesis) to simulate a plucked string instrument:
+CODE::
+SynthDef("plucking", {arg out = 0, amp = 0.1, freq = 440, decay = 5, coef = 0.1;
+var env, snd;
+env = EnvGen.kr(Env.linen(0, decay, 0), doneAction: 2);
+snd = Pluck.ar(
+        in: WhiteNoise.ar(amp),
+        trig: Impulse.kr(0),
+        maxdelaytime: 0.1,
+        delaytime: freq.reciprocal,
+        decaytime: decay,
+        coef: coef);
+    Out.ar(out, snd);
+}).add;
+::
+Write a Pbind to play this instrument. Use all the available controls of this SynthDef in your Pbind. In particular, explore decay and coef in order to understand what they do. Use any combination of Pwhite, Pseq, and Prand inside your Pbind.
+
+NOTE::
+For coef, keep your values between -1 and +1.
+::
+
+See footnote for one solution.
+footnote::
+Writing a Pbind for "plucking" instrument:
+CODE::
+Pbind(
+    \instrument, "plucking",
+    \freq, Pseq([220, 440, 550, 415, 100, 900], inf),
+    \dur, Pwhite(0.2, 0.4),
+    \amp, Prand([0.1, 0.2], inf),
+    \decay, 6, // decay of note (see Pluck help file for details)
+    \coef, 0.5, // closer to 0, bright and resonant; closer to 1, muted;
+    \out, Pseq([0, 1], inf) // alternate left and right channel
+).play;
+::
+::
+
+SECTION::36
+Take as starting point the Pbind you wrote in the previous exercise (with the "plucking" SynthDef). Use \degree instead of \freq, and play any scale of your choice from the list of available ones:
+CODE::
+Scale.directory;
+::
+Play the scale up or down continuously at approximately 60 bpm (each note one beat), with decay times long enough so that notes slightly overlap.
+
+Write a separate synth that takes the sound of the ongoing scale and applies a pitch shifter to it. The ratio of pitch change should oscillate randomly between 0.99 and 1.01. Have the original sound play in the left channel, and the pitch shifted version play in the right channel.
+
+See footnote for one solution.
+footnote::
+Writing a Pbind for "plucking" instrument:
+CODE::
+// Evaluate this first:
+x = { Out.ar(1, PitchShift.ar(in: In.ar(19), pitchRatio: LFNoise2.kr(13).range(0.99, 1.01))) }.play;
+
+// Then start playing the scale:
+Pbind(
+    \instrument, "plucking",
+    \scale, Scale.scriabin,
+    \degree, Pseq([0, 1, 2, 3, 4, 5, 6, 7], inf),
+    \dur, Pwhite(0.9, 1),
+    \amp, 0.2,
+    \decay, 7,
+    \coef, 0.2,
+    \out, [0, 19] // play on left channel & send output to bus 19 as well
+).play;
+
+// Notice that the temp synth (the pitch shifter) is at end of order or execution:
+s.plotTree;
+
+// Have fun and experiment some wilder values for pitchRatio.
+
+::
+::
+
+
+
+SUBSECTION::Answers
+
+Hello.
