@@ -23,7 +23,7 @@ Pseq([1, 2, 3, 4, 5], 2).asStream.all;
 
 (
 Pbind(
-	\midinote, Pseq([60, 62, 63, 65, 67, 68, 71, 72]),
+	\midinote, Pseq([60, 62, 63, 65, 67, 68, 71, 72], 2),
 	\dur, 0.3,
 ).play;
 )
@@ -52,6 +52,10 @@ Pbind(
 // The examples below will use that C minor scale a lot, so let's store it into a variable:
 h = [60, 62, 63, 65, 67, 68, 71, 72];
 
+
+h
+
+
 // We'll now go through a bunch of different Patterns.
 // Like when we learn to speak a new language, this is the moment
 // of learning new words to expand our vocabulary.
@@ -69,7 +73,7 @@ Pbind(
 // Pser
 (
 Pbind(
-	\midinote, Pser(list: h, repeats: 11),
+	\midinote, Pser(list: h, repeats: 15),
 	\dur, 0.15;
 ).play;
 )
@@ -77,7 +81,7 @@ Pbind(
 // Pslide
 (
 Pbind(
-	\midinote, Pslide(list: h, repeats: 7, len: 3, step: 1),
+	\midinote, Pslide(list: h, repeats: 7, len: 3, step: -1),
 	\dur, 0.15;
 ).play;
 )
@@ -145,7 +149,7 @@ Place(c, 3).asStream.all;
 p = Pbind(
     \midinote, Pseries(start: 90, step: -2, length: 21),
 	\dur, 0.1;
-).play;
+).trace.play;
 )
 
 // Pgeom
@@ -153,7 +157,7 @@ p = Pbind(
 p = Pbind(
     \midinote, Pseries(start: 90, step: -2, length: 21),
 	\dur, Pgeom(start: 0.1, grow: 1.1);
-).play;
+).trace.play;
 )
 
 // Ppatlace
@@ -166,6 +170,7 @@ p = Pbind(
     \dur, 0.25
 ).play;
 )
+
 
 // Check it out what it does:
 Ppatlace([Pseries(60, 2, 8), Pseries(72, 2, 8)], inf).asStream.all
@@ -180,27 +185,30 @@ Pbind(
 // Another option: degree (as in scale degree)
 (
 Pbind(
+	\note, Pseq([0, 1, 2, 3, 4, 5, 6, 7], 1),
+	\dur, 0.25;
+).play;
+)
+
+
+
+// Major scale is default for degrees. How to change scales:
+(
+Pbind(
+	\scale, Scale.zamzam, // try minor, chromatic, dorian, etc
 	\degree, Pseq([0, 1, 2, 3, 4, 5, 6, 7], 1),
 	\dur, 0.25;
 ).play;
 )
 
-// Major scale is default for degrees. How to change scales:
-(
-Pbind(
-	\scale, Scale.phrygian, // try minor, chromatic, dorian, etc
-	\degree, Pseq([0, 1, 2, 3, 4, 5, 6, 7], 1),
-	\dur, 0.25;
-).play;
-)
 
 // Ptuple
 (
 Pbind(
 	\scale, Scale.phrygian,
 	\degree, Ptuple([
-		Pseq([5, 6, 5, 6, 8, 7, 6, 7], inf),
-		Pseq([3, 4, 3, 5, 5, 5, 5, 4], inf),
+		Prand([5, 6, 5, 6, 8, 7, 6, 7], inf),
+		Prand([3, 4, 3, 5, 5, 5, 5, 4], inf),
 		Pseq([0, 0, 0, 2, 3, 4, 3, 1], inf)], inf),
 	\dur, Pseq([0.15, 0.15, 0.25, 0.25, 0.15, 0.15, 0.25], inf),
 	\legato, 0.1;
@@ -242,7 +250,8 @@ Pbind(
 	\midinote, Pseq([60, 67, 78, 71, 40], 4),
 	\dur, Pseq([0.1, 0.1, 0.5, 0.4, 1], inf),
 	\art, 1,
-	\amp, 0.2;
+	\amp, 0.2,
+	\awesome, 10
 ).play;
 )
 
@@ -408,25 +417,90 @@ Pslide(
 
 Pslide((-5, -4 .. 12), 20, 3, 1, 0, false).asStream.all.clump(3);
 
+
+// ------------------------------------------------ //
+// DIFFERENCE BETWEEN PBIND AND EVENT STREAM PLAYER
+// ------------------------------------------------ //
+
+// The Pbind is like the actual "SCORE". It is not the "PLAYER"
+// When you call "play" on a Pbind, it returns a
+// Event Stream Player. THAT is the actual "player" of the score.
+
+a = Pbind(\degree, Pwhite(10, 14), \dur, 1/2);
+b = Pbind(\note, Pseq([[0, 4, 9], [-1, 3, 8]], inf), \dur, 1);
+
+~player1 = a.play;
+~player2 = b.play;
+
+// NOW you can ask the PLAYERS to stop:
+~player1.stop;
+~player2.stop;
+
+// Notice that it doesn't make sense to ask the "score" to stop
+
+Pbind( /* blah blah blah */).stop; // wrong
+
+
+// ----------- //
+// SEQUENCING
+// ----------- //
+
+// Simple way (not very flexible):
+
+(
+{
+	~player1 = a.play;
+	1.wait;
+	~player2 = b.play;
+	5.wait;
+	~player1.stop;
+	5.wait;
+	~player2.stop;
+}.fork;
+)
+
+// For more sophisticated control, look up Pspawner
+
+
+// --------------- //
+// CHANGING TEMPO
+// --------------- //
+
+(
+t = TempoClock.new(72/60);
+
+Pbind(
+	\degree, Pseq([7, 8, 9, 10], inf),
+	\legato, 0.1
+).play(t);
+)
+
+// change it as it plays
+t.tempo = 120/60;
+
+// --------- //
+// QUANTIZE
+// --------- //
+
+a.play(quant: 1);
+b.play(quant: 1);
+
+
+
+
 /*
 
 EXERCISE: use Pseries and Pgeom to write a simple Pbind achieving the following musical goals:
 
 a) Create a three-octave descending scale using Pseries;
-b) Create a decreasing series of durations (rallentando) using Pgeom. First note played should have a duration of 1 second, and each successive note should have a shorter duration.
+b) Create a decreasing series of durations (accel) using Pgeom. First note played should have a duration of 1 second, and each successive note should have a shorter duration.
 c) Make every third note accented -- something like mf, p, p, mf, p, p, ... etc.
 
 */
 
 // Scroll down for solution
 
-
-
-
-
-
-
-
+Pgeom(1, 0.9, 22).asStream.all;
 
 
 
@@ -462,10 +536,12 @@ c) Make every third note accented -- something like mf, p, p, mf, p, p, ... etc.
 (
 p = Pbind(
 	\degree, Pseries(7, -1, 22),
-	\dur, Pgeom(1, 0.9, 22),
-	\amp, Pser([0.3, 0.1, 0.1], 22),
+	\dur, Pgeom(1, 0.9, inf),
+	\amp, Pser([0.3, 0.1, 0.1], inf),
 	\legato, 0.3)
 )
+
+p;
 
 p.play;
 
