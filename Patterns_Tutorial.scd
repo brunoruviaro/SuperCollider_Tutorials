@@ -486,7 +486,16 @@ a.play(quant: 1);
 b.play(quant: 1);
 
 
+// -------------- //
+// NEED SOME REST?
+// -------------- //
 
+(
+Pbind(
+\note, Pseq([0, 1, 2, 3, 4, 5], inf),
+\dur, Pseq([0.1, 1, 0.4, Rest(0.1), 1), //
+).play;
+)
 
 /*
 
