@@ -29,3 +29,10 @@
 
 // Tina Traboulsi's "Pachelbel's Canon"
 "https://soundcloud.com/tina-traboulsi/pachabels-canon".openDocument;
+
+
+// ===========================
+// Synthesis Techniques Demo
+// ===========================
+
+"http://sccode.org/bruno".openDocument;
