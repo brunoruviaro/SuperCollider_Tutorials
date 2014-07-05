@@ -60,17 +60,55 @@ Env.perc(1, 0.01, 1, 4).test.plot;  // reverse envelope
 
 // In order to "perform" an Env inside a Synth, you need EnvGen, the Envelope Generator:
 
-{SinOsc.ar(800, 0, 0.5) * EnvGen.kr(Env.perc (0.001, 1))}.play;
+{SinOsc.ar(800, 0, 0.5) * EnvGen.kr(Env.perc(0.001, 1))}.play;
 
-// Another way of writing the same thing:
+// In a SynthDef:
 (
-{
-	var freq, env;
-	freq = 800;
-	env = EnvGen.kr(Env.perc(attackTime: 0.001, releaseTime: 1));
-	SinOsc.ar(freq: freq, mul: env);
-}.play;
+SynthDef("env-example", { arg freq = 440, amp = 0.2;
+	var snd, env;
+	snd = SinOsc.ar(freq: freq, mul: amp);
+	env = EnvGen.kr(Env.perc(attackTime: 0.001, releaseTime: 1), doneAction: 2);
+	Out.ar(0, snd * env);
+}).add;
 )
+
+Synth("env-example");
+
+
+// There is a shortcut to EnvGen. Here are the examples above rewritten using the shortcut:
+
+{ SinOsc.ar(800, 0, 0.5) * Env.perc(0.001, 1).kr }.play;
+
+// In a SynthDef:
+(
+SynthDef("env-example-2", { arg freq = 440, amp = 0.2;
+	var snd, env;
+	snd = SinOsc.ar(freq: freq, mul: amp);
+	env = Env.perc(attackTime: 0.001, releaseTime: 1).kr(doneAction: 2);
+	Out.ar(0, snd * env);
+}).add;
+)
+
+Synth("env-example-2");
+
+
+s.plotTree
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 // Example using a trigger.
 // The "gate" argument of EnvGen triggers the envelope and holds it open while value is > 0.

@@ -20,32 +20,36 @@
 // LANGUAGE VS. SERVER; UGENS
 // --------------------------- //
 
-rrand(-1, 1.0); // Generates a random number between -1 and +1 every time you evaluate. No sound involved.
+rrand(-1, 1.0); // Generates a random number between -1 and +1 every time you evaluate. No sound involved. This happens in the SuperCollider Language.
 
 // Caution: bring your volume down before evaluating the next line...
 
-{LFNoise0.ar(1)}.play; // This outputs numbers at AUDIO RATE (.ar). This is done by the Server.
-// LFNoise0 (through the Server) sends out 44100 samples per second to your sound card. Each sample is a number between -1 and +1. LFNoise0.ar(1) picks a new random number every second. You can inspect what LFNoise0 is doing by using the message "poll":
+{ LFNoise0.ar(1) }.play;
 
-{LFNoise0.ar(1).poll}.play;
+// LFNoise0 (through the Server) sends out 44100 samples per second to your sound card. Each sample is a number between -1 and +1. LFNoise0.ar(1) picks a new random number every second. The .ar means that the output is at AUDIO RATE (commonly 44100 Hz). This is done by the Server.
+
+// You can inspect what LFNoise0 is doing by using the message "poll":
+
+{ LFNoise0.ar(1).poll }.play;
 
 /* poll is polling the output of the UGen 10 times per second, by default, and posting the results in the post window. In other words, out of the 44100 samples being generated every second, poll picks only 10 per second. Try changing the frequency of LFNoise0 and watch (and hear) the results. If it's too loud, you can multiply it by 0.1, for example. */
 
-{(LFNoise0.ar(1) * 0.1).poll}.play;
+{ (LFNoise0.ar(1) * 0.1).poll }.play;
 
 // LFNoise0 is what we call a UGen (Unit Generator).
+
 // From the Help file on UGen:
 /* "UGens represent calculations with signals. They are the basic building blocks of synth definitions on the server, and are used to generate or process both audio and control signals. The many subclasses of UGen are the client-side representations of unit generators, and are used to specify their parameters when constructing synth definitions (see SynthDef). */
 
 // Let's take a look at a less noisy UGen: SinOsc.
 
-{ SinOsc.ar(440, 0, 0.01) }.play;
+{ Out.ar(0, SinOsc.ar(440, 0, 0.01)) }.play;
 
 { SinOsc.ar(440, 0, 0.1) }.play; // parameters are: freq, phase, mul. Take a look at the Help file.
 
 // You can be more explicit with the parameters:
 
-{SinOsc.ar(freq: 440, mul: 0.1)}.play; // note that I can omit a parameter if I'm using this method
+{ SinOsc.ar(freq: 440, mul: 0.1) }.play; // note that I can omit a parameter if I'm using this method
 
 
 
